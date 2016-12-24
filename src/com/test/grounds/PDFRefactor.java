@@ -19,9 +19,11 @@ class PDFRefactor {
                                                  BasicFileAttributes attrs) throws IOException {
                     if (file.toString().endsWith(".pdf")) {
                         Path parent = file.getParent();
-                        Path renamedFile = parent.resolve(parent.getFileName() + ".pdf");
-                        Files.move(file, renamedFile);
-                        Files.copy(renamedFile, destination.resolve(renamedFile.getFileName()));
+                        if (parent != destination) {
+                            Path renamedFile = parent.resolve(parent.getFileName() + ".pdf");
+                            Files.move(file, renamedFile);
+                            Files.copy(renamedFile, destination.resolve(renamedFile.getFileName()));
+                        }
                     }
                     return FileVisitResult.CONTINUE;
                 }
