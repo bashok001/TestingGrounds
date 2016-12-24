@@ -13,21 +13,24 @@ class PDFRefactor {
         try {
             Path source = FileSystems.getDefault().getPath("tests/source");
             final Path destination = FileSystems.getDefault().getPath("tests/dest");
-            Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
+
+            SimpleFileVisitor<Path> fileVisitor = new SimpleFileVisitor<Path>(){
                 @Override
-                public FileVisitResult visitFile(Path file,
-                                                 BasicFileAttributes attrs) throws IOException {
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     if (file.toString().endsWith(".pdf")) {
                         Path parent = file.getParent();
                         if (parent != destination) {
                             Path renamedFile = parent.resolve(parent.getFileName() + ".pdf");
+                            Path destinationFile = destination.resolve(renamedFile.getFileName());
                             Files.move(file, renamedFile);
-                            Files.copy(renamedFile, destination.resolve(renamedFile.getFileName()));
+                            Files.copy(renamedFile, destinationFile);
                         }
                     }
                     return FileVisitResult.CONTINUE;
                 }
-            });
+            };
+
+            Files.walkFileTree(source, fileVisitor);
         } catch (IOException ioEx) {
             ioEx.printStackTrace();
         }
